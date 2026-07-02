@@ -431,7 +431,9 @@
   <script>
     (function() {
       var $ = function(id) { return document.getElementById(id); };
-
+      var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwiJwDFiIcmx1KDQwM_fzJZDi5Zb-sgqHcs6lh1ElF_TfFmQY0JvSNqyZjH5KoQp05H/exec";
+      var hasSubmitted = false;
+      
       var ATTR = 0.30;
       var df = [1/1.1, 1/1.21, 1/1.331];
 
@@ -586,6 +588,21 @@
           paybackWithinThreeYears: paid,
           submittedAt: new Date().toISOString()
         };
+        if (!hasSubmitted) {
+  hasSubmitted = true;
+
+  fetch(APPS_SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "text/plain"
+    },
+    body: JSON.stringify({
+      ...window.latestCoupaRoiSubmission,
+      pageUrl: window.location.href
+    })
+  });
+}
       }
 
       ['company', 'revenue', 'fte', 'platformFee', 'implementationFee', 'renewalDate'].forEach(function(id) {
