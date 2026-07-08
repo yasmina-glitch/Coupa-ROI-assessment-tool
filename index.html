@@ -17,6 +17,8 @@
       --soft-line:#F1F1F1;
       --focus:rgba(0,0,0,.10);
       --shadow:0 24px 80px rgba(0,0,0,.05);
+      --positive:#1F7A4D;
+      --negative:#B42318;
       --font:'DM Sans',system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     }
 
@@ -141,6 +143,11 @@
       font-size:12px;
     }
 
+    .required {
+      color:var(--negative);
+      margin-left:3px;
+    }
+
     .result-card {
       display:flex;
       flex-direction:column;
@@ -176,6 +183,16 @@
       font-weight:500;
       color:var(--ink);
       transition:opacity .22s ease, transform .22s ease;
+    }
+
+    .roi.is-positive,
+    .payback-value.is-positive {
+      color:var(--positive);
+    }
+
+    .roi.is-negative,
+    .payback-value.is-negative {
+      color:var(--negative);
     }
 
     .payback {
@@ -230,6 +247,57 @@
       letter-spacing:-.03em;
     }
 
+    .metric-label {
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .info-tip {
+      position:relative;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:15px;
+      height:15px;
+      border:1px solid var(--line);
+      border-radius:50%;
+      color:var(--muted);
+      font-size:10px;
+      line-height:1;
+      cursor:help;
+      text-transform:none;
+      letter-spacing:0;
+      font-weight:500;
+    }
+
+    .info-tip::after {
+      content:attr(data-tooltip);
+      position:absolute;
+      left:50%;
+      bottom:calc(100% + 10px);
+      transform:translateX(-50%);
+      width:260px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:var(--white);
+      color:var(--ink);
+      box-shadow:0 16px 40px rgba(0,0,0,.10);
+      font-size:12px;
+      line-height:1.45;
+      letter-spacing:0;
+      text-transform:none;
+      opacity:0;
+      pointer-events:none;
+      z-index:10;
+    }
+
+    .info-tip:hover::after,
+    .info-tip:focus-visible::after {
+      opacity:1;
+    }
+
     .result-cta {
       margin-top:16px;
       border:1px solid var(--line);
@@ -267,6 +335,10 @@
       margin-top:12px;
       color:var(--muted);
       font-size:12px;
+    }
+
+    .cta.is-hidden {
+      display:none;
     }
 
     .cta {
@@ -355,12 +427,12 @@
         <h2 class="card-title">Inputs</h2>
 
         <div class="field">
-          <label for="company">Company name</label>
+          <label for="company">Company name<span class="required">*</span></label>
           <input id="company" type="text" placeholder="e.g. Acme Corp" autocomplete="organization">
         </div>
 
         <div class="field">
-          <label for="revenue">Annual revenue</label>
+          <label for="revenue">Annual revenue<span class="required">*</span></label>
           <div class="input-wrap has-prefix">
             <span class="prefix">$</span>
             <input id="revenue" type="text" inputmode="numeric" placeholder="e.g. 3,500,000,000">
@@ -368,12 +440,12 @@
         </div>
 
         <div class="field">
-          <label for="fte">FTEs</label>
+          <label for="fte">FTEs<span class="required">*</span></label>
           <input id="fte" type="text" inputmode="numeric" placeholder="e.g. 10,000">
         </div>
 
         <div class="field">
-          <label for="platformFee">Coupa platform fee</label>
+          <label for="platformFee">Coupa platform fee<span class="required">*</span></label>
           <div class="input-wrap has-prefix">
             <span class="prefix">$</span>
             <input id="platformFee" type="text" inputmode="numeric" placeholder="e.g. 1,100,000">
@@ -382,7 +454,7 @@
         </div>
 
         <div class="field">
-          <label for="implementationFee">One time: Implementation / services fee</label>
+          <label for="implementationFee">One time: Implementation / services fee<span class="required">*</span></label>
           <div class="input-wrap has-prefix">
             <span class="prefix">$</span>
             <input id="implementationFee" type="text" inputmode="numeric" placeholder="e.g. 3,500,000">
@@ -390,7 +462,7 @@
         </div>
 
         <div class="field">
-          <label for="renewalDate">Coupa renewal date</label>
+          <label for="renewalDate">Coupa renewal date<span class="required">*</span></label>
           <input id="renewalDate" type="date">
           <p class="hint">This does not change the calculation.</p>
         </div>
@@ -416,7 +488,7 @@
         <div>
           <div class="secondary-results">
             <div class="mini">
-              <span>Net present value</span>
+              <span class="metric-label">Net present value <span class="info-tip" tabindex="0" data-tooltip="Net Present Value (NPV) is the estimated financial value created over three years after accounting for implementation costs, platform fees, and the time value of money.">i</span></span>
               <strong id="npvOutput">$0</strong>
             </div>
           </div>
@@ -432,7 +504,7 @@
       </div>
     </section>
 
-    <section class="cta">
+    <section class="cta is-hidden" id="templateCta">
       <div>
         <h2>Prefer to explore the model yourself?</h2>
         <p>Open the full spreadsheet, make your own copy, and test scenarios with your own Coupa quote.</p>
@@ -523,11 +595,14 @@
       function showPending(count) {
         $('resultCard').className = 'card result-card is-pending';
         $('companyLine').textContent = 'Complete all fields';
+        $('roiOutput').className = 'roi';
+        $('paybackOutput').className = 'payback-value';
         $('roiOutput').textContent = '0%';
         $('paybackOutput').textContent = '—';
         $('npvOutput').textContent = '$0';
         $('resultMessage').textContent = 'Complete all fields to calculate your ROI.';
         $('progressText').textContent = 'Complete all fields to calculate your ROI.';
+        $('templateCta').className = 'cta is-hidden';
       }
 
       function calc() {
@@ -578,9 +653,12 @@
         $('resultCard').className = 'card result-card is-ready';
         $('progressText').textContent = 'All fields complete. ROI calculated.';
         $('companyLine').textContent = inputs.company;
+        $('roiOutput').className = roi > 0 ? 'roi is-positive' : roi < 0 ? 'roi is-negative' : 'roi';
+        $('paybackOutput').className = paid ? 'payback-value is-positive' : 'payback-value is-negative';
         $('roiOutput').textContent = roiText(roi);
         $('paybackOutput').textContent = paid ? 'Yes' : 'No';
         $('npvOutput').textContent = money(npv);
+        $('templateCta').className = 'cta';
 
         var renewalText = formatRenewalDate(inputs.renewalDate);
         var renewalPhrase = renewalText ? ' before your ' + renewalText + ' renewal' : '';
