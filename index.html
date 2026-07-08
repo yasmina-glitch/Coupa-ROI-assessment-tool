@@ -248,9 +248,10 @@
     }
 
     .metric-label {
-      display:flex;
+      display:inline-flex;
       align-items:center;
       gap:6px;
+      white-space:nowrap;
     }
 
     .info-tip {
@@ -258,17 +259,20 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      width:15px;
-      height:15px;
+      flex:0 0 auto;
+      width:16px;
+      height:16px;
       border:1px solid var(--line);
       border-radius:50%;
       color:var(--muted);
+      background:var(--white);
       font-size:10px;
       line-height:1;
       cursor:help;
       text-transform:none;
       letter-spacing:0;
-      font-weight:500;
+      font-weight:600;
+      transform:translateY(-1px);
     }
 
     .info-tip::after {
@@ -277,8 +281,8 @@
       left:50%;
       bottom:calc(100% + 10px);
       transform:translateX(-50%);
-      width:260px;
-      padding:10px 12px;
+      width:min(280px, calc(100vw - 48px));
+      padding:11px 13px;
       border:1px solid var(--line);
       border-radius:12px;
       background:var(--white);
@@ -288,13 +292,39 @@
       line-height:1.45;
       letter-spacing:0;
       text-transform:none;
+      white-space:normal;
+      text-align:left;
       opacity:0;
       pointer-events:none;
       z-index:10;
     }
 
+    .info-tip::before {
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:calc(100% + 5px);
+      transform:translateX(-50%) rotate(45deg);
+      width:8px;
+      height:8px;
+      background:var(--white);
+      border-right:1px solid var(--line);
+      border-bottom:1px solid var(--line);
+      opacity:0;
+      pointer-events:none;
+      z-index:11;
+    }
+
+    .info-tip:hover,
+    .info-tip:focus-visible {
+      color:var(--ink);
+      border-color:var(--ink);
+    }
+
     .info-tip:hover::after,
-    .info-tip:focus-visible::after {
+    .info-tip:focus-visible::after,
+    .info-tip:hover::before,
+    .info-tip:focus-visible::before {
       opacity:1;
     }
 
@@ -411,6 +441,17 @@
     @media (max-width:520px) {
       .secondary-results { grid-template-columns:1fr; }
       .card { border-radius:20px; }
+      .info-tip::after {
+        left:auto;
+        right:-14px;
+        transform:none;
+        width:min(260px, calc(100vw - 56px));
+      }
+      .info-tip::before {
+        left:auto;
+        right:0;
+        transform:rotate(45deg);
+      }
     }
   </style>
 </head>
