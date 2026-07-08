@@ -248,47 +248,47 @@
     }
 
     .metric-label {
+      position:relative;
       display:inline-flex;
       align-items:center;
       gap:6px;
       white-space:nowrap;
+      overflow:visible;
     }
 
     .info-tip {
-      position:relative;
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      flex:0 0 auto;
-      width:16px;
-      height:16px;
-      border:1px solid var(--line);
-      border-radius:50%;
+      width:15px;
+      height:15px;
       color:var(--muted);
-      background:var(--white);
-      font-size:10px;
-      line-height:1;
       cursor:help;
-      text-transform:none;
-      letter-spacing:0;
-      font-weight:600;
       transform:translateY(-1px);
+      overflow:visible;
     }
 
-    .info-tip::after {
-      content:attr(data-tooltip);
+    .info-tip svg {
+      display:block;
+      width:15px;
+      height:15px;
+      stroke:currentColor;
+    }
+
+    .info-tip-tooltip {
       position:absolute;
-      left:50%;
-      bottom:calc(100% + 10px);
-      transform:translateX(-50%);
-      width:min(280px, calc(100vw - 48px));
+      left:0;
+      top:calc(100% + 8px);
+      width:min(300px, calc(100vw - 48px));
       padding:11px 13px;
       border:1px solid var(--line);
       border-radius:12px;
       background:var(--white);
       color:var(--ink);
       box-shadow:0 16px 40px rgba(0,0,0,.10);
+      font-family:inherit;
       font-size:12px;
+      font-weight:400;
       line-height:1.45;
       letter-spacing:0;
       text-transform:none;
@@ -296,35 +296,16 @@
       text-align:left;
       opacity:0;
       pointer-events:none;
-      z-index:10;
+      z-index:50;
     }
 
-    .info-tip::before {
-      content:"";
-      position:absolute;
-      left:50%;
-      bottom:calc(100% + 5px);
-      transform:translateX(-50%) rotate(45deg);
-      width:8px;
-      height:8px;
-      background:var(--white);
-      border-right:1px solid var(--line);
-      border-bottom:1px solid var(--line);
-      opacity:0;
-      pointer-events:none;
-      z-index:11;
-    }
-
-    .info-tip:hover,
-    .info-tip:focus-visible {
+    .metric-label:hover .info-tip,
+    .metric-label:focus-within .info-tip {
       color:var(--ink);
-      border-color:var(--ink);
     }
 
-    .info-tip:hover::after,
-    .info-tip:focus-visible::after,
-    .info-tip:hover::before,
-    .info-tip:focus-visible::before {
+    .metric-label:hover .info-tip-tooltip,
+    .metric-label:focus-within .info-tip-tooltip {
       opacity:1;
     }
 
@@ -441,16 +422,8 @@
     @media (max-width:520px) {
       .secondary-results { grid-template-columns:1fr; }
       .card { border-radius:20px; }
-      .info-tip::after {
-        left:auto;
-        right:-14px;
-        transform:none;
+      .info-tip-tooltip {
         width:min(260px, calc(100vw - 56px));
-      }
-      .info-tip::before {
-        left:auto;
-        right:0;
-        transform:rotate(45deg);
       }
     }
   </style>
@@ -529,7 +502,7 @@
         <div>
           <div class="secondary-results">
             <div class="mini">
-              <span class="metric-label">Net present value <span class="info-tip" tabindex="0" data-tooltip="Net Present Value (NPV) is the estimated financial value created over three years after accounting for implementation costs, platform fees, and the time value of money.">i</span></span>
+              <span class="metric-label">Net present value <span class="info-tip" tabindex="0" aria-label="What is Net Present Value?"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.5" stroke-width="1.4"></circle><path d="M8 7.2v4" stroke-width="1.4" stroke-linecap="round"></path><path d="M8 4.8h.01" stroke-width="1.8" stroke-linecap="round"></path></svg></span><span class="info-tip-tooltip" role="tooltip">Net present value (NPV) estimates the financial value created over three years after accounting for implementation costs, platform fees, and the time value of money.</span></span>
               <strong id="npvOutput">$0</strong>
             </div>
           </div>
