@@ -477,7 +477,7 @@
 
         <div class="field">
           <label for="renewalDate">Coupa renewal date<span class="required">*</span></label>
-          <input id="renewalDate" type="date">
+          <input id="renewalDate" type="text" inputmode="numeric" maxlength="10" placeholder="MM/DD/YYYY">
           <p class="hint">This does not change the calculation.</p>
         </div>
 
@@ -574,10 +574,19 @@
         return (rounded > 0 ? '+' : '') + rounded + '%';
       }
 
+      function normalizeDate(value){
+        var m=String(value||'').replace(/\D/g,'');
+        if(m.length>2)m=m.slice(0,2)+'/'+m.slice(2);
+        if(m.length>5)m=m.slice(0,5)+'/'+m.slice(5,9);
+        return m;
+      }
+
       function formatRenewalDate(value) {
         if (!value) return '';
-        var date = new Date(value + 'T00:00:00');
-        return date.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+        var p=value.split('/');
+        if(p.length!==3) return value;
+        var date=new Date(p[2]+'-'+p[0]+'-'+p[1]+'T00:00:00');
+        return date.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
       }
 
       function getInputs() {
@@ -714,8 +723,13 @@
 }
       }
 
-      ['company', 'revenue', 'fte', 'platformFee', 'implementationFee', 'renewalDate'].forEach(function(id) {
+      ['company', 'revenue', 'fte', 'platformFee', 'implementationFee'].forEach(function(id) {
         $(id).addEventListener('input', calc);
+      });
+
+      $('renewalDate').addEventListener('input', function(){
+        this.value=normalizeDate(this.value);
+        calc();
       });
 
       ['revenue', 'fte', 'platformFee', 'implementationFee'].forEach(function(id) {
