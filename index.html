@@ -23,9 +23,11 @@
     }
 
     * { box-sizing:border-box; }
-    html { scroll-behavior:smooth; }
+    html { scroll-behavior:smooth; height:auto; }
     body {
       margin:0;
+      height:auto;
+      min-height:0;
       background:var(--white);
       color:var(--ink);
       font-family:var(--font);
@@ -433,7 +435,6 @@
   <main class="page">
     <section class="hero">
       <p class="eyebrow">Based on <em>The Total Economic Impact™ of Coupa for Source-To-Pay</em>, a Forrester Consulting study commissioned by Coupa.</p>
-      <h1>Does Coupa's 276% ROI apply to you?</h1>
       <p class="subhead">Coupa's 276% ROI was modeled on a company with 60,000 employees and $80 billion in revenue. If that's not you, run the model on your own company.</p>
     </section>
 
@@ -758,5 +759,40 @@
       showPending(0);
     })();
   </script>
+
+  <script>
+    (function () {
+      function sendHeight() {
+        var height = Math.ceil(Math.max(
+          document.body.scrollHeight,
+          document.body.offsetHeight,
+          document.documentElement.scrollHeight,
+          document.documentElement.offsetHeight
+        ));
+
+        window.parent.postMessage(
+          {
+            type: 'resize',
+            height: height
+          },
+          '*'
+        );
+      }
+
+      var resizeObserver = new ResizeObserver(function () {
+        window.requestAnimationFrame(sendHeight);
+      });
+
+      resizeObserver.observe(document.body);
+
+      window.addEventListener('load', sendHeight);
+      window.addEventListener('resize', sendHeight);
+      document.addEventListener('DOMContentLoaded', sendHeight);
+
+      window.requestAnimationFrame(sendHeight);
+      window.setTimeout(sendHeight, 250);
+    })();
+  </script>
+
 </body>
 </html>
