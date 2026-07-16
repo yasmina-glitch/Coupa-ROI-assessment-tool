@@ -23,11 +23,9 @@
     }
 
     * { box-sizing:border-box; }
-    html { scroll-behavior:smooth; height:auto; }
+    html { scroll-behavior:smooth; }
     body {
       margin:0;
-      height:auto;
-      min-height:0;
       background:var(--white);
       color:var(--ink);
       font-family:var(--font);
@@ -762,13 +760,12 @@
 
   <script>
     (function () {
+      var app = document.querySelector('.page');
+
       function sendHeight() {
-        var height = Math.ceil(Math.max(
-          document.body.scrollHeight,
-          document.body.offsetHeight,
-          document.documentElement.scrollHeight,
-          document.documentElement.offsetHeight
-        ));
+        if (!app) return;
+
+        var height = Math.ceil(app.scrollHeight);
 
         window.parent.postMessage(
           {
@@ -783,7 +780,9 @@
         window.requestAnimationFrame(sendHeight);
       });
 
-      resizeObserver.observe(document.body);
+      if (app) {
+        resizeObserver.observe(app);
+      }
 
       window.addEventListener('load', sendHeight);
       window.addEventListener('resize', sendHeight);
